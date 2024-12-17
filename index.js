@@ -11,12 +11,16 @@ let finish = false;
 let numb = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
 let action = ['/', 'x', '+', '-', '%'];
 
+const baseFontSize = 60;
+const minFontSize = 18;
+
 function clearAll() {
   x = '';
   y = '';
   sign = '';
   finish = false;
   displaySolution.textContent = 0;
+  displaySolution.style.fontSize = `${baseFontSize}px`;
 }
 
 function valuesAdd(e) {
@@ -36,14 +40,23 @@ function valuesAdd(e) {
 
   if (numb.includes(key)) {
     if (finish) {
-      clearAll();
+      x = displaySolution.textContent; 
+       y = '';
+      finish = false;
+       displaySolution.textContent = ''; 
     }
 
-    if (key === '.' && ((sign === '' && x.includes('.')) || (sign !== '' && y.includes('.')))) {
+    if (
+      key === '.' &&
+      ((sign === '' && x.includes('.')) || (sign !== '' && y.includes('.')))
+    ) {
       return;
     }
 
-    if (key === '0' && ((sign === '' && x === '0') || (sign !== '' && y === '0'))) {
+    if (
+      key === '0' &&
+      ((sign === '' && x === '0') || (sign !== '' && y === '0'))
+    ) {
       return;
     }
 
@@ -51,17 +64,22 @@ function valuesAdd(e) {
       if (x === '0' && key !== '.') x = '';
       x += key;
       displaySolution.textContent = x;
+      adjustFontSize();
       console.log(x, sign, y);
     } else {
       if (y === '0' && key !== '.') y = '';
       y += key;
       displaySolution.textContent = y;
+      adjustFontSize();
     }
-    finish = false;
     return;
   }
 
   if (action.includes(key)) {
+      if(finish){
+            finish = false;
+            y = ''; 
+      }
     if (x === '' && key !== '-') {
       return;
     }
@@ -75,6 +93,7 @@ function valuesAdd(e) {
     }
     sign = key;
     displaySolution.textContent = sign;
+    displaySolution.style.fontSize = `${baseFontSize}px`;
     console.log(x, sign, y);
     return;
   }
@@ -83,9 +102,11 @@ function valuesAdd(e) {
     if (y !== '') {
       y = String(Number(y) / 100);
       displaySolution.textContent = y;
+      adjustFontSize();
     } else if (x !== '') {
       x = String(Number(x) / 100);
       displaySolution.textContent = x;
+      adjustFontSize();
     }
     return;
   }
@@ -93,6 +114,7 @@ function valuesAdd(e) {
   if (key === '=') {
     calculateResult();
     finish = true;
+    adjustFontSize();
     console.log(x, sign, y);
   }
 }
@@ -137,6 +159,19 @@ function deleteLastSymbol() {
     x = x.slice(0, -1);
     displaySolution.textContent = x;
   }
+
+  adjustFontSize();
+}
+
+function adjustFontSize() {
+  const textLength = displaySolution.textContent.length;
+  let newFontSize = baseFontSize;
+
+  if (textLength > 7) {
+    newFontSize = Math.max(baseFontSize - (textLength - 7) * 2, minFontSize);
+  }
+
+  displaySolution.style.fontSize = `${newFontSize}px`;
 }
 
 values.addEventListener('click', valuesAdd);
